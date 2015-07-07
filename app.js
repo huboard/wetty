@@ -42,7 +42,7 @@ var opts = require('optimist')
 var runhttps = false;
 var sshport = 22;
 var sshhost = 'localhost';
-var sshauth = 'password';
+var sshauth = 'publickey';
 var globalsshuser = '';
 
 if (opts.sshport) {
@@ -103,27 +103,14 @@ wss.on('request', function(request) {
         sshuser = request.resource;
         sshuser = sshuser.replace('/wetty/ssh/', '');
     }
-    if (sshuser) {
-        sshuser = sshuser + '@';
-    } else if (globalsshuser) {
-        sshuser = globalsshuser + '@';
-    }
     conn.on('message', function(msg) {
         var data = JSON.parse(msg.utf8Data);
         if (!term) {
-            if (process.getuid() == 0) {
-                term = pty.spawn('/bin/login', [], {
-                    name: 'xterm-256color',
-                    cols: 80,
-                    rows: 30
-                });
-            } else {
-                term = pty.spawn('ssh', [sshuser + sshhost, '-p', sshport, '-o', 'PreferredAuthentications=' + sshauth], {
-                    name: 'xterm-256color',
-                    cols: 80,
-                    rows: 30
-                });
-            }
+            term = pty.spawn('ssh', ['admin@localhost', '-p', sshport, '-o', 'PreferredAuthentications=' + sshauth], {
+                name: 'xterm-256color',
+                cols: 80,
+                rows: 30
+            });
             console.log((new Date()) + " PID=" + term.pid + " STARTED on behalf of user=" + sshuser)
             term.on('data', function(data) {
                 conn.send(JSON.stringify({
