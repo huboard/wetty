@@ -81,11 +81,11 @@ app.get('/wetty/ssh/:user', function(req, res) {
 app.use('/', express.static(path.join(__dirname, 'public')));
 
 if (runhttps) {
-    httpserv = https.createServer(opts.ssl, app).listen(opts.port, function() {
+    httpserv = https.createServer(opts.ssl, app).listen(opts.port, '127.0.0.1', function() {
         console.log('https on port ' + opts.port);
     });
 } else {
-    httpserv = http.createServer(app).listen(opts.port, function() {
+    httpserv = http.createServer(app).listen(opts.port, '127.0.0.1', function() {
         console.log('http on port ' + opts.port);
     });
 }
